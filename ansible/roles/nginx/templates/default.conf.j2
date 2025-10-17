@@ -1,0 +1,16 @@
+# nginx/templates/default.conf.j2
+server {
+    listen {{ nginx_listen_port | default(80) }} default_server;
+    listen [::]:{{ nginx_listen_port | default(80) }} default_server;
+
+    # Root directory where built React files (index.html, etc.) are served from
+    root /var/www/react_app;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        # For React (Vite/SPA), if a route doesn’t exist as a file, fallback to index.html
+        try_files $uri /index.html;
+    }
+}

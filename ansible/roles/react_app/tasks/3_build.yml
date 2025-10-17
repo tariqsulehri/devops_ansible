@@ -1,0 +1,81 @@
+---
+# ===========================================================
+# 🚀 REACT APP BUILD ROLE — 3_build.yml
+# ===========================================================
+# This role:
+# 1. Ensures dependencies are installed
+# 2. Cleans up old build artifacts
+# 3. Builds the React app in a headless environment (no GUI)
+# ===========================================================
+
+# --------------------------------------
+# 🧩 Ensure node_modules directory exists
+# --------------------------------------
+- name: Ensure repo node_modules cache dir exists
+  ansible.builtin.file:
+    path: "{{ repo_src_dir }}/node_modules"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+  # Ensures directory exists even if npm install is skipped later
+
+  # --------------------------------------
+  # 📦 Install npm dependencies (first time or missing)
+  # --------------------------------------
+- name: Install npm dependencies (idempotent via 'creates' check)
+  ansible.builtin.command: "npm install {{ npm_install_args | default('') }}"
+  args:
+    chdir: "{{ repo_src_dir }}"
+    creates: "{{ repo_src_dir }}/node_modules"
+  environment:
+    NPM_CONFIG_CACHE: "{{ npm_cache_dir | default(omit) }}"
+  register: npm_install_result
+  changed_when: "'added' in npm_install_result.stdout or npm_install_result.rc == 0 and npm_install_result.changed | default(false)"
+  # Uses a simple 'creates' check to ensure idempotency across environments
+
+  # --------------------------------------
+  # 🧹 Clean previous build artifacts (if any)
+  # --------------------------------------
+- name: Clean old build artifacts
+  ansible.builtin.command: rm -rf dist
+  args:
+    chdir: "{{ repo_src_dir }}"
+  ignore_errors: true
+  # Removes old build folder to ensure a clean build
+  # We don’t remove node_modules here to preserve cached deps
+
+  # --------------------------------------
+  # 🔧 Ensure clean dependency install
+  # --------------------------------------
+- name: Clean install dependencies using npm ci
+  ansible.builtin.command: npm ci
+  args:
+    chdir: "{{ repo_src_dir }}"
+  register: npm_ci_result
+  changed_when: npm_ci_result.rc == 0
+  # npm ci ensures deterministic install from package-lock.json
+
+  # --------------------------------------
+  # 🏗️ Build React Application (Headless Mode)
+  # --------------------------------------
+- name: Build React application in headless environment
+  ansible.builtin.command: npm run build
+  args:
+    chdir: "{{ repo_src_dir }}"
+  environment:
+    NODE_ENV: production # Optimize the build for production
+    DISPLAY: "" # Prevent GUI display requirement
+    QT_QPA_PLATFORM: offscreen # Disable Qt/X11 errors (headless mode)
+    QTWEBENGINE_CHROMIUM_FLAGS: "--no-sandbox"
+    CI: "true" # Avoid interactive prompts
+  register: vite_build
+  ignore_errors: false
+  # 'npm run build' triggers Vite build process safely even on servers
+
+  # --------------------------------------
+  # 🧾 Optional: Print Build Summary (Debug)
+  # --------------------------------------
+- name: Show build output (for troubleshooting)
+  ansible.builtin.debug:
+    msg: "{{ vite_build.stdout | default('No build output captured') }}"
+  when: vite_build is defined

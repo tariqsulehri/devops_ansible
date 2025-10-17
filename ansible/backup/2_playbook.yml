@@ -1,0 +1,36 @@
+---
+# This playbook automates the deployment of a React frontend application.
+# It installs required system packages, ensures Nginx is installed, and makes sure the Nginx service is running.
+
+- name: Deploy React Frontend Application     # Descriptive name for the playbook (visible in execution logs)
+  hosts: all                                  # Run these tasks on all target hosts defined in the inventory
+  become: yes                                 # Execute tasks with elevated (sudo/root) privileges since system-level changes are made
+  
+  tasks: 
+    # Task 1:                                    # Start defining the list of tasks to be executed sequentially
+    - name: Ensure required basic system packages are installed # Task 1: Install basic utilities needed by the system or app
+      apt:                                                      # Use the 'apt' module (Ubuntu/Debian package manager)
+        name:                                                   # Specify the list of packages to install
+          - git                                                 # Git is used to clone repositories or manage code
+          - curl                                                # Curl is used for downloading data or communicating with APIs
+        state: present                                          # Ensures the listed packages are installed (if missing, they’ll be installed)
+        update_cache: yes                                       # Updates the apt package cache before installation to ensure latest versions
+    
+    # Task 2:
+    - name: Ensure Nginx is installed                           # Task 2: Install the Nginx web server
+      apt:                                                      # Use the apt module again
+        name: nginx                                             # Package name to install
+        state: present                                          # Ensure Nginx is installed
+        update_cache: yes                                       # Refresh package list to get the latest version if not already cached
+
+    # Task 3:
+    - name: Ensure Nginx is running and enabled                  # Task 3: Make sure Nginx service is active and enabled at startup
+      service:                                                  # Use the 'service' module to manage system services
+        name: nginx                                             # The name of the service to control (Nginx)
+        state: started                                          # Ensures the service is currently running
+        enabled: yes                                            # Ensures the service starts automatically on system boot
+      register: nginx_status                                    # Store the output and status of this task into a variable for later reference or debugging
+   
+    - debug:                                                    # Task 4: Output debug information about the Nginx service status
+        msg: "Nginx service status: {{ nginx_status }}"         # Print the status of the Nginx service to help with troubleshooting or verification
+      when: nginx_status is defined                             # Only run this debug task if the nginx_status variable

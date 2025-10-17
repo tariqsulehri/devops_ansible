@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: MIT-0
+---
+# 1️⃣ Update package cache
+- name: Ensure that cache is up-to-date
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+# 2️⃣ Install Nginx package
+- name: Install Nginx package
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+# 3️⃣ Deploy main Nginx configuration
+- name: Write nginx main configuration from template  
+  template: 
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Nginx
+
+# 4️⃣ Deploy default site configuration
+- name: Deploy site config for default site
+  template:
+    src: default.conf.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Nginx
+
+# 5️⃣ Enable default Nginx site
+- name: Enable default Nginx site
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  notify: Restart Nginx
+
+# 6️⃣ Ensure Nginx web directory exists
+- name: Ensure Nginx service directory exists
+  file:
+    path: /usr/share/nginx/html
+    state: directory
+
+# 7️⃣ Copy default index.html
+- name: Create a simple index.html file
+  copy:
+    src: index.html
+    dest: /usr/share/nginx/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+# 8️⃣ Start and enable Nginx service
+- name: Ensure Nginx service is started and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  register: nginx_status 
+
+# 9️⃣ Display Nginx service status
+- debug:
+    msg: "Nginx service status: {{ nginx_status }}"
+  when: nginx_status is defined

@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for nginx
+
+nginx_package_name: nginx
+nginx_service_name: nginx
+nginx_listen_port: 80
+nginx_user: www-data
+nginx_worker_processes: auto
+nginx_server_name: " {{ ansible_fqdn  }} | default('localhost')  "

@@ -1,0 +1,54 @@
+---
+# ============================================================
+# React Build Deployment Tasks
+# ============================================================
+
+# 1️⃣ Ensure the deployment directory exists with correct permissions
+#    - Creates the directory if it doesn't exist.
+#    - Sets ownership to the target app user (dynamic per VM).
+#    - Ensures it is executable (x) so the user can cd into it.
+- name: Ensure deploy_dir exists
+  ansible.builtin.file:
+    path: "{{ deploy_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+# 2️⃣ Synchronize build artifacts to the Nginx webroot
+#    - Copies only changed files for efficiency (idempotent).
+#    - Uses correct file permissions (read/write for owner, readable for others).
+#    - Ensures all files belong to the app user.
+- name: Synchronize build artifacts to nginx webroot
+  ansible.builtin.copy:
+    src: "{{ repo_src_dir }}/{{ build_dir_name }}/"
+    dest: "{{ deploy_dir }}/"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+    remote_src: yes
+
+# 3️⃣ Ensure directory permissions remain correct recursively
+#    - Fixes any potential misapplied file-like permissions (e.g., 0644 on folders).
+#    - Ensures all directories under deploy_dir are accessible.
+- name: Fix directory permissions recursively
+  ansible.builtin.file:
+    path: "{{ deploy_dir }}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+# 4️⃣ Example: Ensure index.html is readable
+#    - Just verifies the main entry file has expected permissions.
+- name: Ensure index.html is readable by nginx
+  ansible.builtin.file:
+    path: "{{ deploy_dir }}/index.html"
+    owner: "{{ app_user }}"
+    mode: '0644'
+    state: file
+  when: ansible.builtin.stat is defined
+
+# 5️⃣ Trigger Nginx reload if template/site configuration changed
+#    - Makes sure the web server reflects any deployment updates.
+- name: Notify Nginx to reload
+  ansible.builtin.meta: flush_handlers

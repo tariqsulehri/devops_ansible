@@ -1,0 +1,27 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for react_app
+# roles/react_app/defaults/main.yml
+
+# repo configuration
+
+repo_branch: "main"
+
+# deployment paths
+app_user: "www-data"                # user for ownership on files (nginx user)
+deploy_dir: "/var/www/react_app"    # where build artifacts live for nginx
+repo_src_dir: "/opt/react_src"      # where repo will be cloned on remote host
+
+# node configuration
+nodejs_version: "20.x"              # Nodejs major version to install via NodeSource
+npm_cache_dir: "/home/{{ ansible_user }}/.npm"   # optional
+
+# runtime/build
+build_dir_name: "dist"             # 'build' (create-react-app) or 'dist' etc.
+npm_install_args: ""                # additional args for npm install if required
+
+# git authentication
+# Use deploy_key_path or ssh_agent_forwarding; do NOT place plain passwords here
+deploy_key_local_path: ""           # local path to private deploy key (optional)
+deploy_key_dest: "/root/.ssh/deploy_key"  # where to copy the key on remote (if used)
+use_ssh_agent_forwarding: true      # prefer agent forwarding over copying keys

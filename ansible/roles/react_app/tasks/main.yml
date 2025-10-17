@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for react_app
+- name: Ensure Pre-requisites are installed
+  import_tasks: 1_nodejs.yml
+
+- name: Clone or update application repository
+  import_tasks: 2_git.yml
+
+- name: Install dependencies and build React application
+  import_tasks: 3_build.yml
+
+- name: Deploy built application to nginx webroot
+  import_tasks: 4_deploy.yml

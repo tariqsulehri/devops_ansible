@@ -1,0 +1,83 @@
+---
+- name: Deploy React Application
+  hosts: all
+  become: yes
+
+  vars:
+    app_dir: /var/www/react_fe
+    repo_url: "https://github.com/tariqsulehri/react_fe.git"
+
+  tasks:
+    - name: Ensure required system packages are installed
+      apt:
+        name:
+        - git
+        - curl
+        state: present
+        update_cache: yes
+
+    - name: Add node source repository
+      shell: |
+       curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+        apt-get install -y nodejs
+      args:
+        executable: /bin/bash   
+    
+    - name: Ensure Node.js and npm are installed
+      apt:
+        name: nodejs
+        state: present
+    
+    - name: Verify Node.js installation
+      command: node -v
+      register: node_version
+
+    - debug:
+        msg: "Node.js version is {{ node_version.stdout }}"      
+
+    - name: Clone React application repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+
+    - name: Install application dependencies
+      npm:
+        path: "{{ app_dir }}"
+        state: present
+
+    - name: Build React Application
+      command: npm run build
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Ensure Nginx is installed
+      apt:
+        name: nginx
+        state: present
+    
+    - name: Check React build directory
+      stat:
+        path: "{{ app_dir }}/dist"
+      register: react_build_dir   
+
+    - name: Fail if React build directory does not exist
+      fail:
+        msg: "React build directory does not exist. Build failed."
+      when: not react_build_dir.stat.exists  
+
+    - name: Configure Nginx to serve React application
+      copy:
+       src: /var/www/react_fe/dist/
+       dest:  /usr/share/nginx/html/
+       owner: www-data
+       group: www-data  
+       mode: '0755'
+       remote_src: yes
+
+    - name: Start and enable Nginx service
+      service:
+        name: nginx
+        state: started  
+        enabled: yes

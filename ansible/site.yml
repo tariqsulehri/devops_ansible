@@ -1,0 +1,27 @@
+---
+- name: Deploy nginx on web servers
+  hosts: frontend
+  become: yes
+  vars_files:
+    - group_vars/all.yml        # Non-sensitive vars
+    - group_vars/vault.yml      # 🔐 Encrypted vars
+
+  roles:
+     - role: nginx
+       nginx_listen_port: 80
+       nginx_server_name: "example.com"
+     - role: react_app
+
+# - name: Install System Packages
+#   hosts: all
+#   become: yes
+
+#   tasks:
+#     - name: Ensure required system packages are installed
+#       apt:
+#         name:
+#           - git
+#           - curl
+#         state: present
+#         update_cache: yes
+

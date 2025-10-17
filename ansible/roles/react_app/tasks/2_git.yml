@@ -1,0 +1,22 @@
+- name: Ensure repo source directory exists
+  ansible.builtin.file:
+    path: " {{ repo_src_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+  tags: clone
+
+- name: Clone repository (or update existing checkout)
+  ansible.builtin.git:
+    repo: "{{ github_react_repo_url }}"
+    dest: "{{ repo_src_dir }}"
+    #version: "{{ repo_version }}"
+    accept_hostkey: yes
+    update: yes
+
+  register: git_clone_result
+
+- name: Debug git changed
+  ansible.builtin.debug:
+    msg: "Repository was changed (new commits pulled or branch/tag changed)."
+  when: git_clone_result.changed

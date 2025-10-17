@@ -1,0 +1,8 @@
+# ================================
+# 🔐 Vault File - Encrypted Secrets
+# ================================
+# Use `ansible-vault encrypt group_vars/vault.yml`
+# to encrypt this file after editing.
+
+github_react_repo_url: "https://REDACTED@github.com/tariqsulehri/react_fe.git"
+github_token: "REDACTED"
