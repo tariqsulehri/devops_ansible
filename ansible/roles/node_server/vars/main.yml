@@ -1,0 +1,10 @@
+app_user: "{{ ansible_user_id }}"
+deploy_dir: /var/www/node_app
+repo_src_dir: "/home/{{ app_user }}/opt/node_src"
+app_name: node_app
+app_entry_point: index.js
+nodejs_version: 20.x
+app_port: 3500
+db_host: localhost
+db_user: user
+db_pass: password

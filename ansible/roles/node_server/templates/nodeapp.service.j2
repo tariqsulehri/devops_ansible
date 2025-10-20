@@ -1,0 +1,16 @@
+[Unit]
+Description=Node.js Application - {{ service_name }}
+After=network.target
+
+[Service]
+EnvironmentFile={{ deploy_dir }}/.env
+ExecStart=/usr/bin/node {{ deploy_dir }}/app.js
+Restart=always
+User={{ app_user }}
+WorkingDirectory={{ deploy_dir }}
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{ service_name }}
+
+[Install]
+WantedBy=multi-user.target

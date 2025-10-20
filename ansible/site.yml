@@ -7,21 +7,32 @@
     - group_vars/vault.yml      # 🔐 Encrypted vars
 
   roles:
-     - role: nginx
-       nginx_listen_port: 80
-       nginx_server_name: "example.com"
-     - role: react_app
+      - role: nginx
+        nginx_listen_port: 80
+        nginx_server_name: "example.com"
+      - role: react_app
+
+- name: Setup system packages on all servers
+  hosts: backend
+  become: yes
+  vars_files:
+    - group_vars/all.yml        # Non-sensitive vars
+    - group_vars/vault.yml      # 🔐 Encrypted vars
+    - vars/main.yml
+    
+  roles:
+    - role: node_server
 
 # - name: Install System Packages
 #   hosts: all
 #   become: yes
 
-#   tasks:
-#     - name: Ensure required system packages are installed
-#       apt:
-#         name:
-#           - git
-#           - curl
-#         state: present
-#         update_cache: yes
+  # tasks:
+  #   - name: Ensure required system packages are installed
+  #     apt:
+  #       name:
+  #         - git
+  #         - curl
+  #       state: present
+  #       update_cache: yes
 

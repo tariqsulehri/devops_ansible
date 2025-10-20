@@ -1,0 +1,4 @@
+---
+node_version: "20.x"
+npm_global_packages:
+  - pm2

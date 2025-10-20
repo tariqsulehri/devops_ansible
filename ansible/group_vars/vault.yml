@@ -5,4 +5,7 @@
 # to encrypt this file after editing.
 
 github_react_repo_url: "https://REDACTED@github.com/tariqsulehri/react_fe.git"
+github_nodejs_repo_url: "https://REDACTED@github.com/tariqsulehri/node_be.git"
 github_token: "REDACTED"
+
+git_branch_node: "main"
