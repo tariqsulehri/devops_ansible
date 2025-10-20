@@ -8,11 +8,9 @@
 
   roles:
       - role: nginx
-        nginx_listen_port: 80
-        nginx_server_name: "example.com"
       - role: react_app
 
-- name: Setup system packages on all servers
+- name: Node Server Deployment on backend servers
   hosts: backend
   become: yes
   vars_files:
