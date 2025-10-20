@@ -2,9 +2,10 @@
 - name: Deploy nginx on web servers
   hosts: frontend
   become: yes
-  vars_files:
 
-    - group_vars/all/vault.yml      # 🔐 Encrypted vars
+  vars_files:
+    - group_vars/vault.yml      # 🔐 Encrypted vars
+    - group_vars/vault.yml      # 🔐 Encrypted vars
 
   roles:
       - role: nginx
@@ -14,7 +15,8 @@
   hosts: backend
   become: yes
   vars_files:
-    - group_vars/all/vault.yml      # 🔐 Encrypted vars
+    - group_vars/vault.yml      # 🔐 Encrypted vars
+    - group_vars/vault.yml      # 🔐 Encrypted vars
     - vars/main.yml
     
   roles:

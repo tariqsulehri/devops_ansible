@@ -1,0 +1,3 @@
+# group_vars/all.yml
+git_branch_node: "main"
+git_branch_react: "main"
