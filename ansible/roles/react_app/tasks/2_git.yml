@@ -13,8 +13,16 @@
     #version: "{{ repo_version }}"
     accept_hostkey: yes
     update: yes
-
+  environment:
+    GIT_ASKPASS: /tmp/git_askpass.sh
+    GIT_TERMINAL_PROMPT: "0"
+  become: yes
   register: git_clone_result
+
+- name: Remove temporary askpass script
+  file:
+  path: /tmp/git_askpass.sh
+  state: absent
 
 - name: Debug git changed
   ansible.builtin.debug:

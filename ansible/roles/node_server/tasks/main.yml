@@ -43,8 +43,16 @@
     force: yes
     update: yes
     accept_hostkey: yes
-  become_user: "{{ app_user }}"
+  environment:
+        GIT_ASKPASS: /tmp/git_askpass.sh
+        GIT_TERMINAL_PROMPT: "0"
+  become: yes  
+  # become_user: "{{ app_user }}"
 
+- name: Remove temporary askpass script
+  file:
+    path: /tmp/git_askpass.sh
+    state: absent
 
 # 4️⃣ Install Node.js dependencies
 - name: Install Node.js dependencies
