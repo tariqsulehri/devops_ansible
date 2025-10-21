@@ -4,7 +4,7 @@
   become: yes
 
   vars_files:
-    - group_vars/vault.yml      # 🔐 Encrypted vars
+    - group_vars/all.yml      # 🔐 Encrypted vars
     - group_vars/vault.yml      # 🔐 Encrypted vars
 
   roles:
@@ -15,7 +15,7 @@
   hosts: backend
   become: yes
   vars_files:
-    - group_vars/vault.yml      # 🔐 Encrypted vars
+    - group_vars/all.yml      # 🔐 Encrypted vars
     - group_vars/vault.yml      # 🔐 Encrypted vars
     - vars/main.yml
     
