@@ -1,38 +1,37 @@
 ---
-# Install packages required for building a React app and add NodeSource repo.
+# Install Node.js 22.x for backend applications
+
+- name: Remove old NodeSource repo if exists
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/nodesource.list
+    state: absent
+
 - name: Ensure that the cache is up-to-date
   ansible.builtin.apt:
     update_cache: yes
-  # when: ansible_os_family == "Debian"
   tags: nodejs
 
-- name: Ensure curl is installed (Debian)
-  ansible.builtin.apt:
-    name: curl
-    state: present
-  # when: ansible_os_family == "Debian"
-  tags: nodejs
-
-- name: Add NodeSource repository GPG key
-  ansible.builtin.apt_key:
-    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
-    state: present
-  # when: ansible_os_family == "Debian"
-  tags: nodejs
-
-- name: Add NodeSource repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
-    state: present
-    filename: nodesource
-  # when: ansible_os_family == "Debian"
-  tags: nodejs
-
-- name: Install Node.js and build-essential
+- name: Ensure curl and build tools are installed
   ansible.builtin.apt:
     name:
-    - nodejs
-    - build-essential
+      - curl
+      - build-essential
     state: present
-    update_cache: yes
-  # when: ansible_os_family == "Debian"
+  tags: nodejs
+
+- name: Add NodeSource 22.x repository and install Node.js
+  ansible.builtin.shell: |
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+    apt-get install -y nodejs
+  args:
+    executable: /bin/bash
+  tags: nodejs
+
+- name: Verify Node.js installation
+  ansible.builtin.command: node -v
+  register: node_version
+  changed_when: false
+
+- name: Display installed Node.js version
+  ansible.builtin.debug:
+    msg: "Node.js version installed: {{ node_version.stdout }}"

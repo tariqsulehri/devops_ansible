@@ -1,3 +1,14 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for mysql
+# Main entry point for MySQL role
+
+- name: Install MySQL
+  ansible.builtin.include_tasks: 1_install.yml
+
+- name: Secure MySQL Installation
+  ansible.builtin.include_tasks: 2_secure.yml
+
+- name: Configure MySQL settings
+  ansible.builtin.include_tasks: 3_configure.yml
+
+- name: Create and configure databases
+  ansible.builtin.include_tasks: 4_database.yml

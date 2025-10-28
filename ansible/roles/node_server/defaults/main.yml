@@ -1,4 +1,15 @@
 ---
-node_version: "20.x"
+# Node.js / PM2 deployment defaults
+
+node_version: "22.x"                   # Node.js version to install
 npm_global_packages:
-  - pm2
+  - pm2                                # Global npm packages
+app_user: "{{ ansible_user_id }}"      # User to run app and PM2
+app_name: node_app                     # PM2 process name
+deploy_dir: "/home/deployments/node_app"
+repo_src_dir: "/home/deployments/node_app"
+node_entry_point: index.js             # Entry point of Node.js app
+app_port: 3500                         # App port
+db_host: localhost
+db_user: user
+db_pass: password

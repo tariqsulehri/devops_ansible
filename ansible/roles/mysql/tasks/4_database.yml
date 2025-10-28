@@ -1,0 +1,8 @@
+---
+# Example — create application database
+- name: Create sample database
+  community.mysql.mysql_db:
+    name: tkxel_ecom
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"

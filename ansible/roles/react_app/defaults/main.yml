@@ -13,7 +13,7 @@ deploy_dir: "/var/www/react_app"    # where build artifacts live for nginx
 repo_src_dir: "/opt/react_src"      # where repo will be cloned on remote host
 
 # node configuration
-nodejs_version: "20.x"              # Nodejs major version to install via NodeSource
+nodejs_version: "22.x"              # Nodejs major version to install via NodeSource
 npm_cache_dir: "/home/{{ ansible_user }}/.npm"   # optional
 
 # runtime/build

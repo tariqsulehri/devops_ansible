@@ -1,0 +1,19 @@
+---
+# 1️⃣ Allow remote connections
+- name: Configure MySQL to listen on all IPs
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: "bind-address = {{ mysql_bind_address }}"
+  notify: Restart MySQL
+
+# 2️⃣ Allow root remote access (optional)
+- name: Allow MySQL root to connect remotely
+  community.mysql.mysql_user:
+    name: "{{ mysql_remote_user }}"
+    host: "{{ mysql_remote_host }}"
+    password: "{{ mysql_root_password }}"
+    priv: "*.*:ALL,GRANT"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"

@@ -4,6 +4,9 @@
 - name: Ensure Pre-requisites are installed
   import_tasks: 1_nodejs.yml
 
+- name: Ensure Vite is installed
+  import_tasks: 5_vite.yml
+
 - name: Clone or update application repository
   import_tasks: 2_git.yml
 

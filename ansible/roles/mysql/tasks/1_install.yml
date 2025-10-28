@@ -1,0 +1,21 @@
+---
+- name: Ensure apt cache is updated
+  apt:
+    update_cache: yes
+
+- name: Install MySQL server
+  apt:
+    name: mysql-server
+    state: present
+
+- name: Install Python MySQL dependencies (for Ansible modules)
+  apt:
+    name:
+    - python3-pymysql
+    state: present
+
+- name: Ensure MySQL service is running and enabled
+  service:
+    name: mysql
+    state: started
+    enabled: yes

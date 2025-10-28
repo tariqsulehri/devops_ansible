@@ -3,27 +3,14 @@
 # tasks file for node_server
 
 # 1️⃣ Install Node.js {{ nodejs_version }}, npm, git, and curl
-- name: Ensure curl is installed
-  apt:
-    name: curl
-    state: present
-    update_cache: yes
 
-- name: Add NodeSource setup script for Node.js {{ nodejs_version }}
-  shell: |
-    curl -fsSL https://deb.nodesource.com/setup_{{ nodejs_version }} | bash -
-  args:
-    executable: /bin/bash
-
-- name: Install Node.js {{ nodejs_version }}, npm, and git
+- name: Ensure curl and git installed
   apt:
     name:
-      - nodejs
       - git
+      - curl
     state: present
-    update_cache: yes
-
-
+    update_cache: yes    
 # 2️⃣ Ensure Deployment directory exists
 - name: Ensure deployment directory exists
   file:
@@ -38,7 +25,7 @@
 - name: Clone or update Node.js application source code
   git:
     repo: "{{ github_nodejs_repo_url }}"
-    dest: "{{ repo_src_dir }}"
+    dest: "{{ deploy_dir }}"
     version: "{{ git_branch_node }}"
     force: yes
     update: yes
@@ -57,7 +44,7 @@
 # 4️⃣ Install Node.js dependencies
 - name: Install Node.js dependencies
   npm:
-    path: "{{ repo_src_dir }}"
+    path: "{{ deploy_dir }}"
     production: yes
   become_user: "{{ app_user }}"
 
@@ -66,7 +53,7 @@
 - name: Configure environment variable file
   template:
     src: env.j2
-    dest: "{{ repo_src_dir }}/.env"
+    dest: "{{ deploy_dir }}/.env"
     owner: "{{ app_user }}"
     mode: '0644'
   notify: Restart Node App
@@ -74,7 +61,7 @@
 
 # 6️⃣ Install PM2 globally
 - name: Ensure Pre-requisites are installed
-  import_tasks: 2_pm2.yml
+  import_tasks: 3_pm2.yml
 
 
 # 8️⃣ Save PM2 process list
@@ -83,7 +70,7 @@
   command: pm2 save
 
 
-# 9️⃣ Setup PM2 startup service
-- name: Setup PM2 startup service
-  become_user: "{{ app_user }}"
-  command: pm2 startup systemd -u {{ app_user }} --hp /home/{{ app_user }}
+# # 9️⃣ Setup PM2 startup service
+# - name: Setup PM2 startup service
+#   become_user: "{{ app_user }}"
+#   command: pm2 startup systemd -u {{ app_user }} --hp /home/{{ app_user }}

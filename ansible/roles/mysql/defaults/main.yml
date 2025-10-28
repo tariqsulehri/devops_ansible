@@ -1,3 +1,17 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# defaults file for mysql
+mysql_root_user: root
+mysql_root_password: "Root@123"
+
+mysql_remote_user: "root"
+
+mysql_bind_address: "0.0.0.0"
+mysql_remote_host: "%"
+
+mysql_port: 3306
+
+mysql_database: tkxel_ecom
+mysql_app_user: tkxel_admin
+mysql_app_password: "Tkxel@123"
+
+mysql_service_name: mysql
+mysql_conf_file: /etc/mysql/mysql.conf.d/mysqld.cnf

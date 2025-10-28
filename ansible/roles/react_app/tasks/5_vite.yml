@@ -1,0 +1,40 @@
+# Ensure Vite and xvfb are properly installed
+
+- name: Check if Vite is already installed
+  ansible.builtin.command: vite --version
+  register: vite_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Remove conflicting vite file if exists
+  ansible.builtin.file:
+    path: /usr/bin/vite
+    state: absent
+  when: vite_check.rc != 0 and ansible_facts['os_family'] == "Debian"
+  become: true
+
+- name: Install Vite globally via npm
+  ansible.builtin.command: npm install -g vite
+  args:
+    creates: /usr/local/bin/vite
+  when: vite_check.rc != 0
+  become: true
+  environment:
+    PATH: "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin"
+
+- name: Verify Vite installation
+  ansible.builtin.command: vite --version
+  register: vite_version
+  changed_when: false
+
+- name: Display installed Vite version
+  ansible.builtin.debug:
+    msg: "✅ Vite version installed: {{ vite_version.stdout }}"
+
+- name: Ensure xvfb is installed
+  ansible.builtin.apt:
+    name: xvfb
+    state: present
+    update_cache: yes
+  become: true
+  tags: nodejs
